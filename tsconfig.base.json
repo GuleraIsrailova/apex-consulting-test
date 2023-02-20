@@ -15,6 +15,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@apex-consulting-test/contracts": ["libs/contracts/src/index.ts"],
       "@apex-consulting-test/interfaces": ["libs/interfaces/src/index.ts"]
     }
   },

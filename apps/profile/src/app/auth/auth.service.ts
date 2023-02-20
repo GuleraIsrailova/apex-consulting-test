@@ -1,10 +1,10 @@
 import {HttpException, HttpStatus, Injectable, UnauthorizedException} from '@nestjs/common';
-import {LoginDto, Refresh, RegisterDto} from "./auth.controller";
 import {UserRepository} from "../user/repositories/user.repository";
 import {UserEntity} from "../user/entities/user.entity";
 import {compare, genSalt, hash} from "bcryptjs";
 import {JwtService} from "@nestjs/jwt";
 import {ConfigService} from "@nestjs/config";
+import {ProfileLogin, ProfileRefreshTokens, ProfileRegister} from "@apex-consulting-test/contracts";
 
 @Injectable()
 export class AuthService {
@@ -14,7 +14,7 @@ export class AuthService {
               private configService: ConfigService,
               ) {}
 
-  async register ({ email, password }:RegisterDto) {
+  async register ({ email, password }: ProfileRegister.Request) {
       const oldUser = await this.userRepository.findUserByEmail(email);
       if(oldUser) {
         throw new HttpException ('User already exists',HttpStatus.BAD_REQUEST);
@@ -35,7 +35,7 @@ export class AuthService {
       }
   }
 
-  async login ({ email, password }:LoginDto) {
+  async login ({ email, password }: ProfileLogin.Request) {
       const user = await this.validateUser(email, password);
       const tokens = this.generateTokens({email});
       user.refreshToken = tokens.refreshToken;
@@ -47,25 +47,25 @@ export class AuthService {
         }
   }
 
-  async refresh({ refreshToken }:Refresh) {
-     if(!refreshToken) {
-       throw new UnauthorizedException({message:'csdcf'});
-     }
-     const userData = this.validateRefreshToken(refreshToken);
-     const user = await this.userRepository.findUserByRefreshToken(refreshToken);
+  async refresh({ refreshToken }: ProfileRefreshTokens.Request) {
+       if(!refreshToken) {
+         throw new UnauthorizedException({message:'csdcf'});
+       }
+       const userData = this.validateRefreshToken(refreshToken);
+       const user = await this.userRepository.findUserByRefreshToken(refreshToken);
 
-      if (!userData || !user) {
-        throw new UnauthorizedException();
+        if (!userData || !user) {
+          throw new UnauthorizedException();
+        }
+      const email = user.email
+      const tokens = this.generateTokens({ email });
+      user.refreshToken = tokens.refreshToken;
+      await this.userRepository.updateUser(user);
+      return {
+        email: email,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
       }
-    const email = user.email
-    const tokens = this.generateTokens({ email });
-    user.refreshToken = tokens.refreshToken;
-    await this.userRepository.updateUser(user);
-    return {
-      email: email,
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-    }
   }
 
   async validateUser (email:string, password:string) {
