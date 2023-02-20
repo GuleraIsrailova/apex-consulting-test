@@ -10,6 +10,9 @@ export class User extends Document implements UserInterface {
 
   @Prop({ required: true })
   passwordHash: string;
+
+  @Prop({ required: true })
+  refreshToken: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
