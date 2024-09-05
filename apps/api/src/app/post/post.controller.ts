@@ -11,9 +11,11 @@ import {PostService} from "./post.service";
 import {CreatePostDto} from "./dtos/create.post.dto";
 import {UpdatePostDto} from "./dtos/update.post.dto";
 import {JwtAuthGuard} from "../guards/jwt.auth.guard";
+import {ApiTags} from "@nestjs/swagger";
 
 
 @Controller('post')
+@ApiTags('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
@@ -46,4 +48,5 @@ export class PostController {
   remove(@Param('id') id: string) {
     return this.postService.remove(id);
   }
+
 }

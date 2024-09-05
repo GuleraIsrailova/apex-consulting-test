@@ -1,10 +1,76 @@
-version: '3.1'
-services:
-  rmq:
-    image: rabbitmq:3-management
-    restart: always
-    ports:
-      - "15672:15672"
-      - "5672:5672"
+#version: '3.1'
+#services:
+#  rmq:
+#    image: rabbitmq:3-management
+#    restart: always
+#    ports:
+#      - "15672:15672"
+#      - "5672:5672"
 
+  import { Entity, ManyToOne, Property, Unique } from '@mikro-orm/core';
+  import { BaseEntity } from './base-entity';
+  import { User } from './user';
+  import { ServiceName } from './service-name';
+  import { ServiceStatus } from './service-status';
+  import { AccrualType } from './accrual-type';
+  import { ServiceType } from './service-type';
+  import { MeasurementUnit } from './measurement-unit';
+  import { Office } from './office';
 
+  @Entity({ tableName: 'service_tariff' })
+  @Unique({ properties: ['serviceName'] })
+  export class ServiceTariff extends BaseEntity {
+  @ManyToOne({ entity: () => User, nullable: true })
+createdBy?: User;
+
+  @ManyToOne({ entity: () => User, nullable: true })
+updatedBy?: User;
+
+  @ManyToOne({ entity: () => ServiceName, nullable: false })
+serviceName: ServiceName;
+
+  @Property({ nullable: false, default: 21 })
+accrualDate: number;
+
+  @ManyToOne({ entity: () => ServiceStatus, nullable: false })
+serviceStatus: ServiceStatus;
+
+  @ManyToOne({ entity: () => AccrualType, nullable: false })
+accrualType: AccrualType;
+
+  @ManyToOne({ entity: () => ServiceType, nullable: false })
+serviceType: ServiceType;
+
+  @ManyToOne({ entity: () => MeasurementUnit, nullable: false })
+measurementUnit: MeasurementUnit;
+
+  @Property({ nullable: false, default: false })
+isPenalty: boolean;
+
+  @Property({ nullable: true })
+penaltyPercentage: number;
+
+  @Property({ nullable: false, default: 1 })
+tariff: number;
+
+  @Property({ nullable: false })
+servicePeriodStartDate: Date;
+
+  @Property({ nullable: false })
+servicePeriodEndDate: Date;
+
+  @Property({ nullable: false, default: 10 })
+paymentPeriod: number;
+
+  @Property({ nullable: false, default: false })
+accrualByAverage: boolean;
+
+  @Property({ nullable: false, default: 15 })
+readingCollectionStartDate: number;
+
+  @Property({ nullable: false, default: 20 })
+readingCollectionEndDate: number;
+
+  @ManyToOne({ entity: () => Office, nullable: false })
+office: Office;
+}

@@ -4,8 +4,10 @@ import { LoginDto } from '../dtos/login.dto';
 import { RegisterDto } from '../dtos/register.dto';
 import {ProfileLogin, ProfileRefreshTokens, ProfileRegister} from "@apex-consulting-test/contracts";
 import {RefreshTokensDto} from "../dtos/refresh.dto";
+import {ApiTags} from "@nestjs/swagger";
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
   constructor(
     private readonly rmqService: RMQService
